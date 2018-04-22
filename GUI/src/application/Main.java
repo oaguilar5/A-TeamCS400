@@ -15,6 +15,7 @@ public class Main extends Application {
 			Parent root = FXMLLoader.load(getClass().getResource("GUI.fxml"));
 			Scene scene = new Scene(root,999,745);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setTitle("Tournament Bracket Pro");
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {
