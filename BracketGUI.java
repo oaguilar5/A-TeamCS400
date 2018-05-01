@@ -60,6 +60,11 @@ public class BracketGUI extends Application {
 
 	private static Tournament t1;
 	private static Challenger[] c;
+	private static int count1 = 0;
+	private static int count2 = 0;
+	private static int count3 = 0;
+	private static int count4 = 0;
+	private static int count5 = 0;
 	
 	/**
 	 * The main method is responsible for setting of the Tournament before 
@@ -87,13 +92,21 @@ public class BracketGUI extends Application {
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Tournament Bracket");
 		BorderPane bPane = new BorderPane();
-		Scene scene = new Scene(bPane, 1000, 600, Color.DARKGRAY);
+		Scene scene = new Scene(bPane, 2000, 1300, Color.DARKGRAY);
+		
 
+		HBox[] winners = new HBox[c.length-2];
 		HBox[] challengers = new HBox[c.length];
 		VBox[] m2 = new VBox[c.length / 2];
-		VBox[] round = new VBox[2];
+		VBox[] m3 = new VBox[m2.length-1];
+		VBox[] round = new VBox[(int) (Math.log(c.length) / Math.log(2))];
 		Label[] names = new Label[c.length];
+		Label[] winnerNames = new Label[winners.length];
 		TextField[] inputs = new TextField[c.length];
+		TextField[] inputs2 = new TextField[winners.length];
+		HBox total = new HBox(100);
+		Button[] s1 = new Button[m2.length];
+		Button[] s2 = new Button[m3.length];
 		
 		//when there is no challenger
 		if (c.length == 0) {
@@ -136,12 +149,26 @@ public class BracketGUI extends Application {
 				names[i].setAlignment(Pos.CENTER);
 				names[i].setMinHeight(25);
 				names[i].setText(c[i].getName());
-				inputs[i].setMaxHeight(20);
+				inputs[i].setMaxHeight(15);
 				inputs[i].setMaxWidth(100);
 				inputs[i].setPromptText("Enter Score");
 				inputs[i].setFocusTraversable(false);
 				challengers[i].getChildren().addAll(names[i], inputs[i]);
 			}
+			//winner of each game; 
+			for(int ii = 0; ii < winners.length; ii++) {
+				winners[ii] = new HBox();
+				winnerNames[ii] = new Label();
+				inputs2[ii] = new TextField();
+				winnerNames[ii].setAlignment(Pos.CENTER);
+				winnerNames[ii].setMinHeight(25);
+				winnerNames[ii].setText("game"+ (ii+1)+" winner");
+				inputs2[ii].setMaxHeight(20);
+				inputs2[ii].setMaxWidth(100);
+				inputs2[ii].setPromptText("Enter Score");
+				inputs2[ii].setVisible(false);
+				winners[ii].getChildren().addAll(winnerNames[ii], inputs2[ii]);
+ 			}
 			
 			//If there are only two challengers from the start, 
 			//it will only perform championship game
@@ -194,42 +221,195 @@ public class BracketGUI extends Application {
 				
 				//stores match by grouping first two challengers
 				int i = 0;
-				int k = challengers.length-1;
 				for (int j = 0; j < m2.length; j++) {
+					s1[j] = new Button();
+					s1[j].setText("Submit");
+					s1[j].setMaxWidth(10); // how to show everything
+					s1[j].setOnAction(new EventHandler<ActionEvent>() {
+						
+						@Override
+						public void handle(ActionEvent event) {
+							
+							c[count1].setScore(Integer.parseInt(inputs[count1].getText()));
+							c[count1+1].setScore(Integer.parseInt(inputs[count1+1].getText()));
+
+							if(Integer.parseInt(inputs[count1].getText()) > Integer.parseInt(inputs[count1+1].getText())) {
+								winnerNames[count2].setText(names[count1].getText());
+							}
+							else {
+								winnerNames[(count2)].setText(names[(count1+1)].getText());
+							}
+							inputs[count1].setText(inputs[count1].getText());
+							inputs[count1].setEditable(false);
+							inputs[count1+1].setText(inputs[count1+1].getText());
+							inputs[count1+1].setEditable(false);
+							count1+=2; 
+							count2++;
+							if(count2 %2 == 0) {
+								inputs2[count2-2].setVisible(true);
+								inputs2[count2-1].setVisible(true);
+								s2[count3].setVisible(true);
+								count3++;
+							}
+							if(count3 == c.length/2) {
+					
+							
+								c = t1.matchMaking(c);
+								
+							}
+	
+						}
+					});
 					Text[] gameNum = new Text[m2.length];
 					gameNum[j] = new Text("Game"+ (j+1));
 					gameNum[j].setFont(Font.font("Arial", 15));
 					m2[j] = new VBox(10);
-					m2[j].getChildren().addAll(gameNum[j], challengers[i], challengers[k]);
-					i++;
-					k--;
+					m2[j].getChildren().addAll(gameNum[j], challengers[i], challengers[i+1],s1[j]);
+					i+=2;
 				}
+				i = 0; 
+//				count1 = 0;
+//				count3 = 0;
+				for(int jj = 0; jj< m3.length; jj++) {
+					s2[jj] = new Button();
+					s2[jj].setText("Submit");
+					s2[jj].setVisible(false);
+					s2[jj].setOnAction(new EventHandler<ActionEvent>() {
+						
+						@Override
+						public void handle(ActionEvent event) {
+//							if(count5 == challengers.length/2-1) {
+//								HBox w = new HBox();
+//								if(Integer.parseInt(inputs2[count4].getText()) > Integer.parseInt(inputs2[count4+1].getText())) {
+//									Text t = new Text("1st place: " + winnerNames[count2-1] +
+//													" 2nd place:" + winnerNames[count4-3]);
+//									w.getChildren().add(w);
+//									w.setAlignment(Pos.CENTER);
+//									bPane.setRight(w);
+//								}
+//								else {
+//									Text t = new Text("1st place: " + winnerNames[count2-2] +
+//													" 2nd place:" + winnerNames[count4-2]);
+//									w.getChildren().add(w);
+//									w.setAlignment(Pos.CENTER);
+//									bPane.setRight(w);
+//								}
+								
+//							}
+							c[count4].setScore(Integer.parseInt(inputs2[count4].getText()));
+							c[count4+1].setScore(Integer.parseInt(inputs2[count4+1].getText()));
+
+							if(Integer.parseInt(inputs2[count4].getText()) > Integer.parseInt(inputs2[count4+1].getText())) {
+								winnerNames[count2].setText(winnerNames[count4].getText());
+							}
+							else {
+								winnerNames[(count2)].setText(winnerNames[(count4+1)].getText());
+							}
+							inputs2[count4].setText(inputs2[count4].getText());
+							inputs2[count4].setEditable(false);
+							inputs2[count4+1].setText(inputs2[count4+1].getText());
+							inputs2[count4+1].setEditable(false);
+							
+							if(count2 %2 == 0) {
+								inputs2[count2-2].setVisible(true);
+								inputs2[count2-1].setVisible(true);
+								s2[count3].setVisible(true);
+								count3++;
+								count5++;
+							}
+							
+							count4+=2; 
+							count2++;
+							//display first place, 2nd place and 3rd place 
+//							if(count3 == c.length/2) {
+//								c = t1.matchMaking(c);
+//							}
+	
+						}
+					});
+					Text[] gameNum = new Text[m3.length];
+					gameNum[jj] = new Text("Game" + (jj+m2.length+1));
+					gameNum[jj].setFont(Font.font("Arial", 15));
+					m3[jj] = new VBox(10);
+					m3[jj].getChildren().addAll(gameNum[jj], winners[i], winners[i+1], s2[jj]);
+					i+=2;
+				}
+				
 			}
 			
 			//Put first half of challengers on the left side
 			//and other half on the right side
-			round[0] = new VBox(40);
-			round[1] = new VBox(40);
+			round[0] = new VBox(10);
+
 			for (int l = 0; l < m2.length; l++) {
-				if (l < m2.length / 2) {
-					round[0].getChildren().add(m2[l]);
-				} else {
-					round[1].getChildren().add(m2[l]);
-				}
+				round[0].getChildren().add(m2[l]);
 
 			}
+				if(m3.length == 7) {
+					round[1] = new VBox(40);
+					round[2] = new VBox(80);
+					round[3] = new VBox(160);
+					
+					round[1].getChildren().addAll(m3[0], m3[1], m3[2],m3[3]);
+					round[1].setAlignment(Pos.CENTER_RIGHT);
+					round[2].getChildren().addAll(m3[4],m3[5]);
+					round[2].setAlignment(Pos.CENTER);
+					round[3].getChildren().addAll(m3[6]);
+					round[3].setAlignment(Pos.CENTER);
+					total.getChildren().addAll(round[0],round[1], round[2], round[3]);
+					
+				}
+				else if(m3.length ==5) {
+					round[1].getChildren().addAll(m3[0], m3[1], m3[2],m3[3]);
+					round[2].getChildren().addAll(m3[4],m3[5]);
+				}
+				else if(m3.length == 3) {
+					round[1] = new VBox(40);
+					round[2] = new VBox(80);
+					round[1].getChildren().addAll(m3[0], m3[1]);
+					round[1].setAlignment(Pos.CENTER_RIGHT);
+					round[2].getChildren().add(m3[2]);
+					round[2].setAlignment(Pos.CENTER);
+					total.getChildren().addAll(round[0],round[1], round[2]);
+				}
+				else {
+					round[1].getChildren().addAll(m3[0]);
+					round[1].setAlignment(Pos.CENTER_RIGHT);
+					total.getChildren().add(round[1]);
+				}
 			
-			//submit button at the bottom-center
-			HBox h1 = new HBox();
-			Button submitButton = new Button();
-			submitButton.setText("Submit");
-			h1.getChildren().add(submitButton);
-			h1.setAlignment(Pos.CENTER);
+//			//submit button at the bottom-center
+//			HBox h1 = new HBox();
+//			Button submitButton = new Button();
+//			submitButton.setText("Submit");
+//			h1.getChildren().add(submitButton);
+//			h1.setAlignment(Pos.CENTER);
+			
+//			submitButton.setOnAction(new EventHandler<ActionEvent>() {
+//			
+//				@Override
+//				public void handle(ActionEvent event) {
+//					for(int i = 0; i< inputs.length; i++) {
+//						c[i].setScore(Integer.parseInt(inputs[i].getText()));
+//						inputs[i].setVisible(false);
+//						//replace input with text and disable the input 
+//					}
+//					for(int j = 0; j < challengers.length/2; j++) {
+//						inputs2[j].setVisible(true);
+//					}
+//					//get the winner and present the bracket with the winner 
+//					
+//				}
+//			});
 
-			bPane.setLeft(round[0]);
-			bPane.setRight(round[1]);
-			bPane.setBottom(h1);
+			
+//			bPane.setBottom(h1);
+			
 		}
+		
+		bPane.setLeft(total);
+
+		
 
 		primaryStage.setScene(scene);
 		primaryStage.show();
