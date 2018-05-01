@@ -1,3 +1,21 @@
+///////////////////////////////////////////////////////////////////////////////
+//Title:            CS400MileStone2
+//
+//Files:            Challenger.java
+//					Match.java
+//					Tournament.java
+//					BracketGUI.java
+//
+//Semester:         CS400 Spring 2018
+//
+//Author:           Jinhyung Ahn, Oscar Aguilar, Zachary Wille
+//Email:            jahn36@wisc.edu, aguilarruval@wisc.edu, 
+//					zwille@wisc.edu
+//
+//Lecturer's Name:  Deb Deppeler
+//
+//Bugs:				no known bugs. 
+////////////////////////////80 columns wide //////////////////////////////////
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -41,15 +59,19 @@ public class Tournament {
 		 	}
 		 	challengers = new Challenger[teamNames.size()];
 		 	//populating the challenger array
-		 	for(int i = 0; i < challengers.length; i++) {
-		 		challengers[i] = new Challenger(teamNames.get(i));
+		 	int j = teamNames.size()-1;
+		 	int k = 0;
+		 	for(int i = 0; i < challengers.length; i+=2) {
+		 		challengers[i] = new Challenger(teamNames.get(k));
+		 		challengers[i+1] = new Challenger(teamNames.get(j));
+		 		k++;
+		 		j--;
 		 	}
 		 	} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		matchMaking(challengers);
 		return challengers; 
 	}
 	
@@ -61,28 +83,24 @@ public class Tournament {
 	 * 					array filled with challengers according to their
 	 * 					ranking
 	 */
-	public void matchMaking(Challenger[] challengers) { 
-		matches = new Match[challengers.length/2];
-		for(int i = 0; i < matches.length; i++) {
-			for(int j = challengers.length-1; j > matches.length-1; j--)
-			matches[i] = new Match(challengers[i], challengers[j]);
-		}
-	}
-	
-	/**
-	 * The tournament method receives match and reset the match after
-	 * each round
-	 * 
-	 * @param Match[] matches
-	 * 						Match object with the result of the match
-	 */
-	public void tournament (Match[] matches) {
-		Match[] newMatches = new Match[matches.length/2];
-		for(int i = 0; i <newMatches.length; i++) {
-			int j = 0;
-			newMatches[i] = new Match(matches[j].getWinner(), matches[j+1].getWinner());
+	public Challenger[] matchMaking(Challenger[] c) { 
+//		matches = new Match[challengers.length/2];
+//		for(int i = 0; i < matches.length; i++) {
+//			for(int j = challengers.length-1; j > matches.length-1; j--)
+//			matches[i] = new Match(challengers[i], challengers[j]);
+//		}
+		Challenger[] c2 = new Challenger[this.challengers.length/2];
+		int j = 0;
+		for(int i = 0; i < c2.length; i++) {
+			if(c[j].getScore() < c[j+1].getScore()) {
+				c2[i] = c[j+1];
+			}
+			else {
+				c2[i] = c[j];
+			}
 			j+=2;
 		}
+		return c2;
 	}
 
 }
