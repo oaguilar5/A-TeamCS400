@@ -3,7 +3,6 @@ package application;
 //Title:            CS400MileStone2
 //
 //Files:            Challenger.java
-//					Match.java
 //					Tournament.java
 //					BracketGUI.java
 //
@@ -68,6 +67,7 @@ public class Main extends Application {
 	private static Tournament t1;
 	private static Challenger[] c;
 	private static int count1 = 0;
+	private static int count2 = 0; 
 	
 
 	/**
@@ -111,7 +111,8 @@ public class Main extends Application {
 			primaryStage.show();
 			return;
 		}
-
+		
+		Challenger[] losers = new Challenger[2];
 		HBox[] challengers = new HBox[c.length * 2 - 2];
 		VBox[] m2 = new VBox[c.length - 1];
 		VBox[] round = new VBox[(int) (Math.log(c.length) / Math.log(2))];
@@ -119,6 +120,7 @@ public class Main extends Application {
 		TextField[] inputs = new TextField[c.length * 2 - 1];
 		HBox total = new HBox(150);
 		Button[] s1 = new Button[c.length - 1];
+		VBox w = new VBox();
 
 		// when there is no challenger
 		
@@ -175,7 +177,7 @@ public class Main extends Application {
 			// If there are only two challengers from the start,
 			// it will only perform championship game
 			if (challengers.length == 2) {
-				HBox w = new HBox();
+				
 				m2 = new VBox[2];
 				m2[0] = new VBox(10);
 				m2[1] = new VBox(10);
@@ -211,8 +213,8 @@ public class Main extends Application {
 				total.getChildren().add(round[0]);
 				bPane.setRight(w);
 			} else {
-
-				// stores match by grouping first two challengers
+				losers[0] = new Challenger("");
+				losers[1] = new Challenger("");
 				int i = 0;
 				for (int j = 0; j < m2.length; j++) {
 					s1[j] = new Button();
@@ -225,7 +227,8 @@ public class Main extends Application {
 					final Label name1 = names[j + c.length];
 					final Label name2 = names[j*2];
 					final Label name3 = names[(j * 2 + 1)];
-					s1[j].setOnAction(new EventHandler<ActionEvent>() {
+					final Button submitj = s1[j];
+					submitj.setOnAction(new EventHandler<ActionEvent>() {
 
 						@Override
 						public void handle(ActionEvent event) {
@@ -241,16 +244,52 @@ public class Main extends Application {
 								alert1.showAndWait().filter(response -> response == ButtonType.OK);
 							} 
 							else {
-								if (c.length == 4) {
-
+								if (count1 == 2) {
+									count1 = 0; 
 								}
-//								c[j * 2].setScore(Integer.parseInt(inputs[j * 2].getText()));
-//								c[j * 2 + 1].setScore(Integer.parseInt(inputs[j * 2 + 1].getText()));
+								if(count2 == c.length-2) {
+									submitj.setDisable(true);
+									if(Integer.parseInt(input1.getText()) > Integer.parseInt(input1_1.getText())) {
+										Text firstPlace = new Text();
+										Text secondPlace = new Text();
+										Text thirdPlace = new Text();
+										firstPlace.setText("1st place: " + name2.getText());
+										firstPlace.setFont(Font.font("Verdana", 40));
+										secondPlace.setText(" 2nd place: " + name3.getText());
+										secondPlace.setFont(Font.font("Verdana", 25));
+										thirdPlace.setText(" 3rd place : " + t1.thirdPlace(losers));
+										thirdPlace.setFont(Font.font("Verdana", 20));
+										w.getChildren().addAll(firstPlace, secondPlace, thirdPlace);
+										w.setAlignment(Pos.CENTER_LEFT);
+										bPane.setRight(w);
+										return;
+									}
+									else {
+										Text firstPlace = new Text();
+										Text secondPlace = new Text();
+										Text thirdPlace = new Text();
+										firstPlace.setText("1st place: " + name3.getText());
+										firstPlace.setFont(Font.font("Verdana", 40));
+										secondPlace.setText(" 2nd place: " + name2.getText());
+										secondPlace.setFont(Font.font("Verdana", 25));
+										thirdPlace.setText(" 3rd place : " + t1.thirdPlace(losers));
+										thirdPlace.setFont(Font.font("Verdana", 20));
+										w.getChildren().addAll(firstPlace, secondPlace, thirdPlace);
+										w.setAlignment(Pos.CENTER_LEFT);
+										bPane.setRight(w);
+										return;
+									}
+								}
+								
 								if (Integer.parseInt(input1.getText()) > Integer
 										.parseInt(input1_1.getText())) {
 									name1.setText(name2.getText());
+									losers[count1].setName(name3.getText());
+									losers[count1].setScore(Integer.parseInt(input1_1.getText()));
 								} else {
 									name1.setText(name3.getText());
+									losers[count1].setName(name2.getText());
+									losers[count1].setScore(Integer.parseInt(input1.getText()));
 								}
 								input1.setText(input1.getText());
 								input1.setEditable(false);
@@ -258,9 +297,10 @@ public class Main extends Application {
 								input1_1.setEditable(false);
 								if (!input1.isEditable() && !input1_1.isEditable()) {
 									input2.setVisible(true);
-//									input3.setVisible(true);
+									submitj.setDisable(true);
 								}
 								count1++;
+								count2++;
 							}
 						}
 						
@@ -268,7 +308,6 @@ public class Main extends Application {
 							Alert alert1 = new Alert(AlertType.ERROR, "Error: Invalid input value. Please, enter integer number");
 							alert1.showAndWait().filter(response -> response == ButtonType.OK);
 						}
-
 						}});
 					Text[] gameNum = new Text[m2.length];
 					gameNum[j] = new Text("Game" + (j + 1));
@@ -277,10 +316,8 @@ public class Main extends Application {
 					m2[j].getChildren().addAll(gameNum[j], challengers[i], challengers[i + 1], s1[j]);
 					i += 2;
 				}
-				i = 0;
-				// Put first half of challengers on the left side
-				// and other half on the right side
 
+				//when there are 16 challengers
 				if (m2.length == 15) {
 					Text roundName[] = new Text[4];
 					HBox r[] = new HBox[4];
@@ -318,6 +355,7 @@ public class Main extends Application {
 					round[3].setAlignment(Pos.CENTER);
 					total.getChildren().addAll(round[0], round[1], round[2], round[3]);
 				}
+				//when there are 8 challengers
 				else if (m2.length == 7) {
 					Text roundName[] = new Text[3];
 					HBox r[] = new HBox[3];
@@ -348,7 +386,8 @@ public class Main extends Application {
 					round[2].setAlignment(Pos.CENTER);
 					total.getChildren().addAll(round[0], round[1], round[2]);
 				}
-
+				
+				//when there are 4 challengers
 				else {
 					Text roundName[] = new Text[2];
 					HBox r[] = new HBox[2];
