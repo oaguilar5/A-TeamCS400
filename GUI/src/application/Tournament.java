@@ -53,22 +53,41 @@ public class Tournament {
 		ArrayList<String> teamNames = new ArrayList<String>();
 		try {
 			//use stream to read file 
+			if(filePath == null) {
+				throw new NullPointerException("invalid filePath");
+			}
 			Stream<String> stream = Files.lines(Paths.get(filePath));
 			stream = stream.map(String::toUpperCase).map(String::trim).filter(x -> x!= null && !x.equals(""));
 		 	List<String> listChallengers = stream.collect(Collectors.toList());	
 		 	for(String s: listChallengers) {
 		 		teamNames.add(s);
 		 	}
-		 	challengers = new Challenger[teamNames.size()];
-		 	//populating the challenger array
-		 	int j = teamNames.size()-1;
-		 	int k = 0;
-		 	for(int i = 0; i < challengers.length; i+=2) {
-		 		challengers[i] = new Challenger(teamNames.get(k));
-		 		challengers[i+1] = new Challenger(teamNames.get(j));
-		 		k++;
-		 		j--;
+		 	if((teamNames.size() == 0) || (teamNames.size() == 1) ||
+		 		(teamNames.size() == 2) || (teamNames.size() == 4) ||
+		 		(teamNames.size() == 8) || (teamNames.size() == 16)) {
+		 		challengers = new Challenger[teamNames.size()];
+			 	//populating the challenger array
+			 	if(challengers.length <= 1) {
+			 		for(int i = 0; i < challengers.length; i++) {
+			 			challengers[i] = new Challenger(teamNames.get(i));
+			 		}
+			 	}
+			 	else {
+			 	int j = teamNames.size()-1;
+			 	int k = 0;
+			 	for(int i = 0; i < challengers.length; i+=2) {
+			 		challengers[i] = new Challenger(teamNames.get(k));
+			 		challengers[i+1] = new Challenger(teamNames.get(j));
+			 		k++;
+			 		j--;
+			 	}
 		 	}
+		 	}
+		 	else {
+		 		throw new IllegalArgumentException("Not appropriate number of challengers");
+		 	}
+		 	
+		
 		 	} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
