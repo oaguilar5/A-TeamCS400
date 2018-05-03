@@ -97,31 +97,17 @@ public class Tournament {
 	}
 	
 	/**
-	 * The matchMaking method receives the file of Challengers and create
-	 * matches between the challenger according to the ranking. For example,
-	 * 1st place will have a match with 16th place if there are 16 teams
-	 * @param Challenger[] challengers
-	 * 					array filled with challengers according to their
-	 * 					ranking
+	 * The third method receives the challenger array of 3rd place and 4th place
+	 * and determine the thrid place. 
+	 * @param 	array filled with challengers according to their ranking
+	 *
+	 * @return	String the string of third place of the tournament 					
 	 */
-	public Challenger[] matchMaking(Challenger[] c) { 
-//		matches = new Match[challengers.length/2];
-//		for(int i = 0; i < matches.length; i++) {
-//			for(int j = challengers.length-1; j > matches.length-1; j--)
-//			matches[i] = new Match(challengers[i], challengers[j]);
-//		}
-		Challenger[] c2 = new Challenger[this.challengers.length/2];
-		int j = 0;
-		for(int i = 0; i < c2.length; i++) {
-			if(c[j].getScore() < c[j+1].getScore()) {
-				c2[i] = c[j+1];
-			}
-			else {
-				c2[i] = c[j];
-			}
-			j+=2;
+	public String thirdPlace(Challenger[] c) {
+		if(c[0].getScore() > c[1].getScore()) {
+			return c[0].getName();
 		}
-		return c2;
+		else
+		return c[1].getName();
 	}
-
 }
