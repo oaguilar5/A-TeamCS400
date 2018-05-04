@@ -1,6 +1,6 @@
 package application;
 ///////////////////////////////////////////////////////////////////////////////
-//Title:            CS400MileStone2
+//Title:            CS400MileStone3
 //
 //Files:            Challenger.java
 //					Tournament.java
@@ -63,10 +63,15 @@ import javafx.scene.layout.BackgroundFill;
  * put scores and make the tournament working.
  */
 public class Main extends Application {
-
+	
+	//Tournament object that populates challengers.
 	private static Tournament t1;
+	//challenger array that stores information of name of challengers
+	//and sorted by the ranking(i.e. 1st place, 16th place, 8th place, 9th place) 
 	private static Challenger[] c;
+	//this is a counter that helps determining 3rd place
 	private static int count1 = 0;
+	//this is a counter until the tournament gets to championship
 	private static int count2 = 0; 
 	
 
@@ -81,16 +86,17 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		t1 = new Tournament();
 		c = t1.readFile("names.txt");
-		// check the length or null
-		// c = t1.readFile(args[0]);
-
+//		 c = t1.readFile(args[0]);
 		launch(args);
 	}
 
 	/**
 	 * The start method is performed after the setting for the tournament is
 	 * finished. It shows the graphics of bracket and allows interaction from the
-	 * user.
+	 * user to fill out the scores and enter submit button. This method shows 
+	 * different features according to the number of the challengers. When the
+	 * user input is not integer, then it shows an alert. The interaction continues
+	 * until the champion is decided. 
 	 * 
 	 * @param Stage
 	 *            primaryStage the primary stage for GUI
@@ -100,6 +106,8 @@ public class Main extends Application {
 		BorderPane bPane = new BorderPane();
 		Scene scene = new Scene(bPane, 1300, 980);
 		scene.getStylesheets().add(Main.class.getResource("application.css").toExternalForm());
+		
+		//When there is no challenger found in the file 
 		if (c.length == 0) {
 			HBox message = new HBox();
 			Text text = new Text("No challenger can be found: no challengers, no games, and no champion.");
@@ -112,19 +120,18 @@ public class Main extends Application {
 			return;
 		}
 		
+		//losers variable keeps in track of losers of the game.
+		//mainly used for figuring out 3rd place 
 		Challenger[] losers = new Challenger[2];
 		HBox[] challengers = new HBox[c.length * 2 - 2];
-		VBox[] m2 = new VBox[c.length - 1];
+		VBox[] matches = new VBox[c.length - 1];
 		VBox[] round = new VBox[(int) (Math.log(c.length) / Math.log(2))];
 		Label[] names = new Label[c.length * 2 - 1];
 		TextField[] inputs = new TextField[c.length * 2 - 1];
 		HBox total = new HBox(150);
 		Button[] s1 = new Button[c.length - 1];
 		VBox w = new VBox();
-
-		// when there is no challenger
 		
-
 		// when there is only one challenger
 		if (c.length == 1) {
 			HBox message = new HBox();
@@ -137,7 +144,6 @@ public class Main extends Application {
 			primaryStage.show();
 			return;
 		}
-
 		// when there are more than one challengers
 		else {
 			HBox container = new HBox();
@@ -146,7 +152,6 @@ public class Main extends Application {
 			container.getChildren().add(instructionText);
 			container.setAlignment(Pos.CENTER);
 			bPane.setTop(container);
-
 			// stores each challenger name and input box into HBox
 			for (int i = 0; i < challengers.length; i++) {
 				challengers[i] = new HBox();
@@ -177,12 +182,11 @@ public class Main extends Application {
 			// If there are only two challengers from the start,
 			// it will only perform championship game
 			if (challengers.length == 2) {
-				
-				m2 = new VBox[2];
-				m2[0] = new VBox(10);
-				m2[1] = new VBox(10);
-				m2[0].getChildren().add(challengers[0]);
-				m2[1].getChildren().add(challengers[1]);
+				matches = new VBox[2];
+				matches[0] = new VBox(10);
+				matches[1] = new VBox(10);
+				matches[0].getChildren().add(challengers[0]);
+				matches[1].getChildren().add(challengers[1]);
 				Text roundName = new Text("Championship");
 				HBox r = new HBox();
 				s1[0] = new Button();
@@ -191,36 +195,51 @@ public class Main extends Application {
 				s1[0].setMaxWidth(80); // how to show everything
 				s1[0].setPrefSize(80, 5);
 				s1[0].setOnAction(new EventHandler<ActionEvent>() {
-
+					
 					@Override
+					//only perfomring championship game 
 					public void handle(ActionEvent event) {
 						if(Integer.parseInt(inputs[0].getText()) > Integer.parseInt(inputs[1].getText())) {
-							Text t = new Text();
-							t.setText("1st place: " + names[0].getText()+"  " + "2nd place: " + names[1].getText());
-							w.getChildren().add(t);
+							Text firstPlace = new Text();
+							Text secondPlace = new Text();
+							firstPlace.setText("1st place: " + names[0].getText());
+							firstPlace.setFont(Font.font("Verdana", 40));
+							secondPlace.setText("2nd place: " + names[1].getText());
+							secondPlace.setFont(Font.font("Verdana", 25));
+							w.getChildren().addAll(firstPlace, secondPlace);
+							w.setAlignment(Pos.CENTER);
 						}
 						else {
-							Text t = new Text();
-							t.setText("1st place: " + names[1].getText() + "  " + "2nd place: " + names[0].getText());
-							w.getChildren().add(t);
+							Text firstPlace = new Text();
+							Text secondPlace = new Text();
+							firstPlace.setText("1st place: " + names[1].getText());
+							firstPlace.setFont(Font.font("Verdana", 40));
+							secondPlace.setText("2nd place: " + names[0].getText());
+							secondPlace.setFont(Font.font("Verdana", 25));
+							w.getChildren().addAll(firstPlace, secondPlace);
+							w.setAlignment(Pos.CENTER);
 						}
 						
 					}});
 				r.getChildren().add(roundName);
 				round[0] = new VBox(80);
-				round[0].getChildren().addAll(m2[0],m2[1],s1[0],r);
+				round[0].getChildren().addAll(matches[0],matches[1],s1[0],r);
 				round[0].setAlignment(Pos.CENTER);
 				total.getChildren().add(round[0]);
 				bPane.setRight(w);
-			} else {
+			} 
+			//When there are more than two challengers(i.e. 4,8,16 challengers) 
+			else {
 				losers[0] = new Challenger("");
 				losers[1] = new Challenger("");
 				int i = 0;
-				for (int j = 0; j < m2.length; j++) {
+				for (int j = 0; j < matches.length; j++) {
 					s1[j] = new Button();
 					s1[j].setText("Submit");
-					s1[j].setMaxWidth(80); // how to show everything
+					s1[j].setMaxWidth(80); 
 					s1[j].setPrefSize(80, 5);
+					//these final variables are created so certain submit button
+					//only makes specific changes 
 					final TextField input1 = inputs[j*2]; 
 					final TextField input1_1 = inputs[j*2+1];
 					final TextField input2 = inputs[j + c.length];
@@ -233,20 +252,23 @@ public class Main extends Application {
 						@Override
 						public void handle(ActionEvent event) {
 							try {
-							Challenger[] c1 = new Challenger[4];
+							//when the user does not put anything and hit submit button
 							if (input1.getText().trim().isEmpty()
 									|| input1_1.getText().trim().isEmpty()) {
 								Alert alert0 = new Alert(AlertType.ERROR, "Error: Missing Scores!");
 								alert0.showAndWait().filter(response -> response == ButtonType.OK);
 							} else if (Integer.parseInt(input1.getText()) == Integer
 									.parseInt(input1_1.getText())) {
+								//when the user input is tie 
 								Alert alert1 = new Alert(AlertType.ERROR, "Error: There must be a winner.");
 								alert1.showAndWait().filter(response -> response == ButtonType.OK);
 							} 
 							else {
+								//count1 helps to keep in track of loser
 								if (count1 == 2) {
 									count1 = 0; 
 								}
+								//when submit button for the championship is clicked 
 								if(count2 == c.length-2) {
 									submitj.setDisable(true);
 									if(Integer.parseInt(input1.getText()) > Integer.parseInt(input1_1.getText())) {
@@ -280,7 +302,7 @@ public class Main extends Application {
 										return;
 									}
 								}
-								
+								//update the loser information when submit button is clicked 
 								if (Integer.parseInt(input1.getText()) > Integer
 										.parseInt(input1_1.getText())) {
 									name1.setText(name2.getText());
@@ -291,10 +313,13 @@ public class Main extends Application {
 									losers[count1].setName(name2.getText());
 									losers[count1].setScore(Integer.parseInt(input1.getText()));
 								}
+								//fixing the value and disable the textfield after hitting submit button
 								input1.setText(input1.getText());
 								input1.setEditable(false);
 								input1_1.setText(input1_1.getText());
 								input1_1.setEditable(false);
+								//updating the winner information for the next round and
+								//disable the current submit button 
 								if (!input1.isEditable() && !input1_1.isEditable()) {
 									input2.setVisible(true);
 									submitj.setDisable(true);
@@ -303,28 +328,28 @@ public class Main extends Application {
 								count2++;
 							}
 						}
-						
+						//when the input the that the user submit is string 
 						catch(NumberFormatException e) {
 							Alert alert1 = new Alert(AlertType.ERROR, "Error: Invalid input value. Please, enter integer number");
 							alert1.showAndWait().filter(response -> response == ButtonType.OK);
 						}
 						}});
-					Text[] gameNum = new Text[m2.length];
+					Text[] gameNum = new Text[matches.length];
 					gameNum[j] = new Text("Game" + (j + 1));
 					gameNum[j].setFont(Font.font("Arial", 10));
-					m2[j] = new VBox(10);
-					m2[j].getChildren().addAll(gameNum[j], challengers[i], challengers[i + 1], s1[j]);
+					matches[j] = new VBox(10);
+					matches[j].getChildren().addAll(gameNum[j], challengers[i], challengers[i + 1], s1[j]);
 					i += 2;
 				}
-
 				//when there are 16 challengers
-				if (m2.length == 15) {
+				if (matches.length == 15) {
 					Text roundName[] = new Text[4];
 					HBox r[] = new HBox[4];
 					for (int l = 0; l < roundName.length; l++) {
 						roundName[l] = new Text();
 						r[l] = new HBox();
 					}
+					//the name for each round for 16 challengers 
 					roundName[0].setText("Round1");
 					roundName[1].setText("Quarter-Final");
 					roundName[2].setText("Semi-Final");
@@ -337,18 +362,18 @@ public class Main extends Application {
 					round[2] = new VBox(80);
 					round[3] = new VBox(160);
 					for (int l = 0; l < 8; l++) {
-						round[0].getChildren().add(m2[l]);
+						round[0].getChildren().add(matches[l]);
 					}
 					round[0].getChildren().add(r[0]);
 					for (int l = 8; l < 12; l++) {
-						round[1].getChildren().add(m2[l]);
+						round[1].getChildren().add(matches[l]);
 					}
 					round[1].getChildren().add(r[1]);
 					for (int l = 12; l < 14; l++) {
-						round[2].getChildren().add(m2[l]);
+						round[2].getChildren().add(matches[l]);
 					}
 					round[2].getChildren().add(r[2]);
-					round[3].getChildren().addAll(m2[14], r[3]);
+					round[3].getChildren().addAll(matches[14], r[3]);
 					round[0].setAlignment(Pos.CENTER);
 					round[1].setAlignment(Pos.CENTER);
 					round[2].setAlignment(Pos.CENTER);
@@ -356,13 +381,14 @@ public class Main extends Application {
 					total.getChildren().addAll(round[0], round[1], round[2], round[3]);
 				}
 				//when there are 8 challengers
-				else if (m2.length == 7) {
+				else if (matches.length == 7) {
 					Text roundName[] = new Text[3];
 					HBox r[] = new HBox[3];
 					for (int l = 0; l < roundName.length; l++) {
 						roundName[l] = new Text();
 						r[l] = new HBox();
 					}
+					//the name for each round for 8 challengers 
 					roundName[0].setText("Quarter-Final");
 					roundName[1].setText("Semi-Final");
 					roundName[2].setText("Championship");
@@ -373,14 +399,14 @@ public class Main extends Application {
 					round[1] = new VBox(80);
 					round[2] = new VBox(160);
 					for (int l = 0; l < 4; l++) {
-						round[0].getChildren().add(m2[l]);
+						round[0].getChildren().add(matches[l]);
 					}
 					round[0].getChildren().add(r[0]);
 					for (int l = 4; l < 6; l++) {
-						round[1].getChildren().add(m2[l]);
+						round[1].getChildren().add(matches[l]);
 					}
 					round[1].getChildren().add(r[1]);
-					round[2].getChildren().addAll(m2[6], r[2]);
+					round[2].getChildren().addAll(matches[6], r[2]);
 					round[0].setAlignment(Pos.CENTER);
 					round[1].setAlignment(Pos.CENTER);
 					round[2].setAlignment(Pos.CENTER);
@@ -395,6 +421,7 @@ public class Main extends Application {
 						roundName[l] = new Text();
 						r[l] = new HBox();
 					}
+					//the name for each round for 4 challengers 
 					roundName[0].setText("Semi-Final");
 					roundName[1].setText("Championship");
 					for (int l = 0; l < r.length; l++) {
@@ -403,10 +430,10 @@ public class Main extends Application {
 					round[0] = new VBox(80);
 					round[1] = new VBox(160);
 					for (int l = 0; l < 2; l++) {
-						round[0].getChildren().add(m2[l]);
+						round[0].getChildren().add(matches[l]);
 					}
 					round[0].getChildren().add(r[0]);
-					round[1].getChildren().addAll(m2[2], r[1]);
+					round[1].getChildren().addAll(matches[2], r[1]);
 					round[0].setAlignment(Pos.CENTER_RIGHT);
 					round[1].setAlignment(Pos.CENTER);
 					total.getChildren().addAll(round[0], round[1]);
@@ -414,9 +441,7 @@ public class Main extends Application {
 			}
 
 		}
-
 		bPane.setLeft(total);
-
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
